@@ -1,40 +1,52 @@
-setwd("~/Desktop/Adv. Stats/Lecture1/Homework1_June05")
+setwd("~/Desktop/Adv. Stats/HW1")
 rm(list=ls())
 workload<-readRDS("workload.rds")
 dataframe <- subset(workload,select=c("Home workload"));dataframe
-dataframe$'Homeworkloadlbl' <- factor(dataframe$`Home workload`,
+dataframe$'Home Workload Label' <- factor(dataframe$`Home workload`,
                                      levels = c(1,2,3,4,5,6),
                                      labels = c("Mom: FT; Dad: FT",
                                                 "Mom: PT; Dad: FT",
-                                                "Mom: NotEmp; Dad: FT",
-                                                "Mom: FT; Dad: PT or NotEmp",
-                                                "Mom: NotEmp; Dad: NotEmp",
-                                                "Other"));dataframe$'Home workloadlbl' 
-levels(dataframe$`Homeworkloadlbl`)
+                                                "Mom: N; Dad: FT",
+                                                "Mom: FT; Dad: PT or NE",
+                                                "Mom: NE; Dad: NE",
+                                                "Other"));dataframe$'Home Workload Label' 
+levels(dataframe$`Home Workload Label`)
 library("dplyr")
 n=nrow(dataframe);n
 
 ### Frequency
-frequency <-dataframe %>%
-  group_by(Homeworkloadlbl) %>%
-  summarise(freq = n()) %>%
-  arrange(desc(freq)); frequency
+freq <-dataframe %>%
+  group_by(`Home Workload Label`) %>%
+  summarise(Frequency = n()) %>%
+  arrange(desc(Frequency)); freq
 
 ### Relative Frequency
 relative_frequency <- dataframe %>%
-  group_by(Homeworkloadlbl) %>%
-  summarise(freq = n()) %>%
-  arrange(desc(freq)) %>%
-  mutate('Relative Frequency'=freq/n);
+  group_by(`Home Workload Label`) %>%
+  summarise(Frequency = n()) %>%
+  arrange(desc(Frequency)) %>%
+  mutate('Relative Frequency'=round(Frequency/n,digits=2));
+
 
 par(mar=c(5,5,5,2)) #Increase the plot section margin size
-count<- table(dataframe$Homeworkloadlbl); count
+count<- table(dataframe$`Home Workload Label`); count
+
+#Sample barplot with las & cex.names attributes
 barplot(count, 
         main="Home Workload Distribution",
         xlab="Home Workload", 
         ylab="Frequency", 
         ylim=c(0,500),
-        border="red", col="lightblue",
+        border="red", col="lightblue", las=2,cex.names=0.6,
+)
+
+#Barplot for homework
+barplot(count, 
+        main="Home Workload Distribution",
+        xlab="Home Workload", 
+        ylab="Frequency", 
+        ylim=c(0,500),
+        border="red", col="lightblue"
 )
 
 #Creating a Pie Chart
@@ -46,9 +58,9 @@ pie(piepercent,
 legend("topright", 
        c("Mom: FT; Dad: FT",
         "Mom: PT; Dad: FT",
-         "Mom: NotEmp; Dad: FT",
-         "Mom: FT; Dad: PT or NotEmp",
-         "Mom: NotEmp; Dad: NotEmp",
+         "Mom: NE; Dad: FT",
+         "Mom: FT; Dad: PT or NE",
+         "Mom: NE; Dad: NE",
          "Other"),
           cex=0.8,
        fill=rainbow(length(count))
